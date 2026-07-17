@@ -2,7 +2,9 @@
 
 An end-to-end analytics project that turns fragmented order, supplier, product, warehouse, shipment, and inventory data into operational KPIs and decision-ready reports.
 
-> **Portfolio result:** The reproducible scenario identifies a 68.0% network on-time delivery rate, isolates the weakest distribution center, and flags inventory with fewer than seven available days of supply.
+> **Portfolio result:** The reproducible scenario identifies a 68.0% network on-time delivery rate, isolates the weakest distribution center, prioritizes inventory exceptions by margin exposure, and quantifies a service-improvement intervention.
+
+![Supply Chain Control Tower executive preview](reports/dashboard_preview.svg)
 
 ## Business problem
 
@@ -12,6 +14,8 @@ Leadership needs one reliable view of fulfillment performance. Orders are growin
 - Which suppliers and warehouses create the most operational risk?
 - Where are shipping costs and cycle times increasing?
 - Which products and regions drive revenue and service failures?
+- Which exceptions should management address first based on financial exposure?
+- How much service improvement could a targeted intervention deliver?
 
 ## Solution
 
@@ -29,8 +33,9 @@ The deterministic generator creates a full year of realistic operational data, i
 
 - Python: reproducible data generation, validation, ETL, and exports
 - SQL/SQLite: relational model and analytical queries
+- Decision support: risk-ranked exception management and scenario analysis
 - Power BI/Tableau-ready CSV outputs
-- `unittest`: pipeline and data-integrity checks
+- GitHub Actions and `unittest`: automated pipeline and integrity checks
 
 ## Data model
 
@@ -52,6 +57,8 @@ suppliers 1---* products 1---* order_lines *---1 orders 1---1 shipments
 - Days of supply and critical inventory exposure
 - Purchase value by supplier
 - Warehouse and monthly performance trends
+- Carrier-lane scorecards and intervention lift
+- Estimated gross-margin exposure
 
 ## Run locally
 
@@ -83,8 +90,11 @@ sql/schema.sql        Relational warehouse definition
 sql/kpi_queries.sql   Executive and operational analysis
 src/pipeline.py       Generation, validation, ETL, and export pipeline
 src/report.py         Executive analysis and portable HTML report
+src/analytics.py      Reusable KPI, exception, and scenario logic
 tests/                Automated integrity and KPI tests
 reports/              Generated portfolio-ready findings
+docs/                 Data dictionary and analytical assumptions
+.github/workflows/    Continuous integration
 ```
 
 ## Design decisions and limitations
@@ -92,6 +102,7 @@ reports/              Generated portfolio-ready findings
 - Synthetic data avoids publishing confidential company information and makes the project fully reproducible.
 - SQLite keeps setup simple; the schema can be migrated to PostgreSQL, BigQuery, or Snowflake.
 - The portable HTML report demonstrates the analysis without requiring proprietary BI software; the processed tables remain ready for Power BI or Tableau.
+- The intervention scenario is a transparent what-if estimate; it supports prioritization but does not claim causal impact.
 
 ## Portfolio takeaway
 

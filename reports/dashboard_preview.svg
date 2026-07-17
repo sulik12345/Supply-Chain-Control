@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="560" viewBox="0 0 1000 560">
+<style>.title{font:700 30px Segoe UI,Arial;fill:#f8fafc}.sub{font:15px Segoe UI,Arial;fill:#94a3b8}.kpi{font:700 29px Segoe UI,Arial;fill:#f8fafc}.caption{font:13px Segoe UI,Arial;fill:#94a3b8}.label{font:15px Segoe UI,Arial;fill:#cbd5e1}.value{font:700 14px Segoe UI,Arial;fill:#f8fafc}.section{font:700 18px Segoe UI,Arial;fill:#f8fafc}</style>
+<rect width="1000" height="560" rx="18" fill="#0f172a"/><text x="45" y="55" class="title">Supply Chain Control Tower</text>
+<text x="45" y="82" class="sub">Executive snapshot · reproducible 2025 scenario</text>
+<g transform="translate(45 115)"><rect width="170" height="105" rx="12" fill="#1e293b"/><text x="18" y="32" class="caption">TOTAL ORDERS</text><text x="18" y="73" class="kpi">1,800</text></g>
+<g transform="translate(230 115)"><rect width="170" height="105" rx="12" fill="#1e293b"/><text x="18" y="32" class="caption">ON-TIME DELIVERY</text><text x="18" y="73" class="kpi">68.0%</text></g>
+<g transform="translate(415 115)"><rect width="170" height="105" rx="12" fill="#1e293b"/><text x="18" y="32" class="caption">FULFILLMENT</text><text x="18" y="73" class="kpi">92.4%</text></g>
+<g transform="translate(600 115)"><rect width="170" height="105" rx="12" fill="#1e293b"/><text x="18" y="32" class="caption">CYCLE TIME</text><text x="18" y="73" class="kpi">6.2 days</text></g>
+<g transform="translate(785 115)"><rect width="170" height="105" rx="12" fill="#1e293b"/><text x="18" y="32" class="caption">SCENARIO LIFT</text><text x="18" y="73" class="kpi">+24.5 pts</text></g>
+<text x="45" y="275" class="section">On-time delivery by distribution center</text><text x="55" y="328" class="label">West Coast DC</text><rect x="250" y="310" width="288" height="25" rx="5" fill="#ef4444"/><text x="553" y="328" class="value">54.3%</text><text x="55" y="382" class="label">Central DC</text><rect x="250" y="364" width="393" height="25" rx="5" fill="#f59e0b"/><text x="658" y="382" class="value">74.2%</text><text x="55" y="436" class="label">East Coast DC</text><rect x="250" y="418" width="400" height="25" rx="5" fill="#10b981"/><text x="665" y="436" class="value">75.4%</text>
+<rect x="45" y="485" width="910" height="42" rx="8" fill="#172554"/><text x="65" y="512" class="label">Decision case: saving 2 West Coast transit days moves service from 54.3% to 78.8% (+135 on-time orders).</text>
+</svg>

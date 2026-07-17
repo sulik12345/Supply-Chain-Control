@@ -7,6 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 import pipeline
+import analytics
 
 
 class PipelineTests(unittest.TestCase):
@@ -47,6 +48,21 @@ class PipelineTests(unittest.TestCase):
         self.assertGreater(delivered, 0)
         self.assertGreater(on_time / delivered, 0.25)
         self.assertLessEqual(on_time / delivered, 1.0)
+
+    def test_exception_queue_is_ranked(self):
+        with sqlite3.connect(pipeline.DB_PATH) as connection:
+            exceptions = analytics.priority_exceptions(connection, 10)
+        self.assertGreater(len(exceptions), 0)
+        exposures = [row[6] for row in exceptions]
+        self.assertEqual(exposures, sorted(exposures, reverse=True))
+        self.assertTrue(all(row[7].startswith(("P1", "P2")) for row in exceptions))
+
+    def test_intervention_scenario_improves_service(self):
+        with sqlite3.connect(pipeline.DB_PATH) as connection:
+            scenario = analytics.intervention_scenario(connection)
+        self.assertGreater(scenario["additional_on_time_orders"], 0)
+        self.assertGreater(scenario["scenario_on_time_pct"], scenario["baseline_on_time_pct"])
+        self.assertLessEqual(scenario["scenario_on_time_pct"], 100.0)
 
 
 if __name__ == "__main__":
