@@ -95,8 +95,27 @@ def generate_data(order_count: int = 1800) -> dict[str, list[dict]]:
             }
         shipments.append(shipment)
 
+    inventory_snapshots = []
+    snapshot_date = date(2025, 12, 31).isoformat()
+    for warehouse in warehouses:
+        for product in products:
+            avg_demand = round(rng.uniform(3, 28), 1)
+            target_days = rng.choices([3, 8, 15, 30], [.12, .28, .42, .18])[0]
+            on_hand = max(0, int(avg_demand * target_days + rng.gauss(0, avg_demand * 2)))
+            allocated = min(on_hand, max(0, int(rng.gauss(avg_demand * 2, avg_demand))))
+            inventory_snapshots.append({
+                "snapshot_date": snapshot_date,
+                "warehouse_id": warehouse["warehouse_id"],
+                "product_id": product["product_id"],
+                "on_hand_units": on_hand,
+                "allocated_units": allocated,
+                "inbound_units": max(0, int(rng.gauss(avg_demand * 7, avg_demand * 3))),
+                "avg_daily_demand": avg_demand,
+            })
+
     return {"suppliers": suppliers, "warehouses": warehouses, "products": products,
-            "orders": orders, "order_lines": lines, "shipments": shipments}
+            "orders": orders, "order_lines": lines, "shipments": shipments,
+            "inventory_snapshots": inventory_snapshots}
 
 
 def validate(data: dict[str, list[dict]]) -> None:
@@ -106,6 +125,8 @@ def validate(data: dict[str, list[dict]]) -> None:
     assert all(row["order_id"] in order_ids for row in data["order_lines"])
     assert all(row["order_id"] in order_ids for row in data["shipments"])
     assert all(int(row["damaged_units"]) >= 0 for row in data["shipments"])
+    expected_snapshots = len(data["warehouses"]) * len(data["products"])
+    assert len(data["inventory_snapshots"]) == expected_snapshots
 
 
 def build_database(data: dict[str, list[dict]]) -> None:
@@ -137,6 +158,21 @@ def export_dashboard_views() -> None:
                    o.order_status, p.product_name, p.category, p.supplier_id,
                    p.unit_cost, p.unit_price, ol.quantity*p.unit_price AS revenue
             FROM order_lines ol JOIN orders o USING(order_id) JOIN products p USING(product_id)""",
+        "inventory_risk": """
+            SELECT i.snapshot_date, i.warehouse_id, w.warehouse_name, i.product_id,
+                   p.product_name, p.category, p.supplier_id, i.on_hand_units,
+                   i.allocated_units, i.inbound_units, i.avg_daily_demand,
+                   i.on_hand_units-i.allocated_units AS available_units,
+                   ROUND((i.on_hand_units-i.allocated_units)/NULLIF(i.avg_daily_demand,0),1) AS days_of_supply,
+                   CASE
+                     WHEN i.on_hand_units-i.allocated_units <= 0 THEN 'Stockout'
+                     WHEN (i.on_hand_units-i.allocated_units)/NULLIF(i.avg_daily_demand,0) < 7 THEN 'Critical'
+                     WHEN (i.on_hand_units-i.allocated_units)/NULLIF(i.avg_daily_demand,0) < 14 THEN 'Watch'
+                     ELSE 'Healthy'
+                   END AS risk_status
+            FROM inventory_snapshots i
+            JOIN warehouses w USING(warehouse_id)
+            JOIN products p USING(product_id)""",
     }
     with sqlite3.connect(DB_PATH) as connection:
         for name, query in queries.items():
@@ -160,4 +196,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

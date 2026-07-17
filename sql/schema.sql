@@ -1,6 +1,7 @@
 PRAGMA foreign_keys = ON;
 
 DROP TABLE IF EXISTS shipments;
+DROP TABLE IF EXISTS inventory_snapshots;
 DROP TABLE IF EXISTS order_lines;
 DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS products;
@@ -59,8 +60,19 @@ CREATE TABLE shipments (
     damaged_units INTEGER NOT NULL DEFAULT 0 CHECK (damaged_units >= 0)
 );
 
+CREATE TABLE inventory_snapshots (
+    snapshot_date TEXT NOT NULL,
+    warehouse_id TEXT NOT NULL REFERENCES warehouses(warehouse_id),
+    product_id TEXT NOT NULL REFERENCES products(product_id),
+    on_hand_units INTEGER NOT NULL CHECK (on_hand_units >= 0),
+    allocated_units INTEGER NOT NULL CHECK (allocated_units >= 0),
+    inbound_units INTEGER NOT NULL CHECK (inbound_units >= 0),
+    avg_daily_demand REAL NOT NULL CHECK (avg_daily_demand >= 0),
+    PRIMARY KEY (snapshot_date, warehouse_id, product_id)
+);
+
 CREATE INDEX idx_orders_date ON orders(order_date);
 CREATE INDEX idx_orders_warehouse ON orders(warehouse_id);
 CREATE INDEX idx_order_lines_product ON order_lines(product_id);
 CREATE INDEX idx_products_supplier ON products(supplier_id);
-
+CREATE INDEX idx_inventory_product ON inventory_snapshots(product_id);

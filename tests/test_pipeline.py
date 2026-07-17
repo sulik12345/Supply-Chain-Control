@@ -26,6 +26,17 @@ class PipelineTests(unittest.TestCase):
             violations = connection.execute("PRAGMA foreign_key_check").fetchall()
         self.assertEqual(violations, [])
 
+    def test_inventory_snapshot_is_complete(self):
+        expected = len(self.data["warehouses"]) * len(self.data["products"])
+        with sqlite3.connect(pipeline.DB_PATH) as connection:
+            actual = connection.execute("SELECT COUNT(*) FROM inventory_snapshots").fetchone()[0]
+            negative_available = connection.execute("""
+                SELECT COUNT(*) FROM inventory_snapshots
+                WHERE on_hand_units < allocated_units
+            """).fetchone()[0]
+        self.assertEqual(actual, expected)
+        self.assertEqual(negative_available, 0)
+
     def test_kpis_are_plausible(self):
         with sqlite3.connect(pipeline.DB_PATH) as connection:
             delivered, on_time = connection.execute("""
@@ -40,4 +51,3 @@ class PipelineTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

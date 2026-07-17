@@ -1,6 +1,8 @@
 # Supply Chain Control Tower
 
-An end-to-end analytics project that turns fragmented order, supplier, product, warehouse, and shipment data into operational KPIs and decision-ready datasets.
+An end-to-end analytics project that turns fragmented order, supplier, product, warehouse, shipment, and inventory data into operational KPIs and decision-ready reports.
+
+> **Portfolio result:** The reproducible scenario identifies a 68.0% network on-time delivery rate, isolates the weakest distribution center, and flags inventory with fewer than seven available days of supply.
 
 ## Business problem
 
@@ -18,6 +20,7 @@ Synthetic operational data
         |
         v
 Data validation -> SQLite warehouse -> SQL KPI layer -> Dashboard-ready CSVs
+                                               \-> Executive HTML/Markdown report
 ```
 
 The deterministic generator creates a full year of realistic operational data, including intentionally uneven warehouse performance so the analysis reveals actionable patterns.
@@ -46,6 +49,7 @@ suppliers 1---* products 1---* order_lines *---1 orders 1---1 shipments
 - Order cycle time
 - Shipping cost per order
 - Supplier damage rate
+- Days of supply and critical inventory exposure
 - Purchase value by supplier
 - Warehouse and monthly performance trends
 
@@ -55,6 +59,7 @@ Requires Python 3.10 or newer. No third-party packages are required.
 
 ```bash
 python src/pipeline.py
+python src/report.py
 python -m unittest discover -s tests -v
 ```
 
@@ -64,6 +69,9 @@ The pipeline creates:
 - `data/raw/`: normalized source CSVs
 - `data/processed/order_performance.csv`: order-level dashboard table
 - `data/processed/line_detail.csv`: product and revenue dashboard table
+- `data/processed/inventory_risk.csv`: SKU-level days-of-supply and risk classification
+- `reports/dashboard.html`: portable executive dashboard
+- `reports/executive_summary.md`: quantified findings and recommendations
 
 Run the queries in `sql/kpi_queries.sql` against the database or connect Power BI/Tableau to the processed CSV files.
 
@@ -74,16 +82,17 @@ data/                 Generated locally
 sql/schema.sql        Relational warehouse definition
 sql/kpi_queries.sql   Executive and operational analysis
 src/pipeline.py       Generation, validation, ETL, and export pipeline
+src/report.py         Executive analysis and portable HTML report
 tests/                Automated integrity and KPI tests
+reports/              Generated portfolio-ready findings
 ```
 
 ## Design decisions and limitations
 
 - Synthetic data avoids publishing confidential company information and makes the project fully reproducible.
 - SQLite keeps setup simple; the schema can be migrated to PostgreSQL, BigQuery, or Snowflake.
-- This first release focuses on the governed analytics layer. A Power BI dashboard and inventory snapshot model are planned next.
+- The portable HTML report demonstrates the analysis without requiring proprietary BI software; the processed tables remain ready for Power BI or Tableau.
 
 ## Portfolio takeaway
 
 This project demonstrates the ability to translate a supply-chain problem into a relational model, validate operational data, calculate service and cost KPIs, and prepare trusted outputs for executive reporting.
-
